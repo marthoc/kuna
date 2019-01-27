@@ -20,17 +20,13 @@ Note:
 This custom component must be installed for it to be loaded by Home Assistant.
 
 1. Create a directory `custom_components` in your Home Assistant configuration directory ('config' share if using [hass.io](https://home-assistant.io/hassio/) with the [Samba](https://home-assistant.io/addons/samba/) add-on or `~/.home-assistant/` for Linux installations).
-1. Get the latest release from the releases page and extract it.
-1. Copy the contents of the resulting "kuna" directory including all sub-directories into the directory `custom_components`.
+1. Get the latest release from GitHub by cd'ing into the custom_components directory and cloning this repo:
+```
+cd custom_components
+git clone https://github.com/marthoc/kuna
+```
 
-It should look similar to this after installation:
-```
-/configuration.yaml
-/custom_components/kuna.py
-/custom_components/binary_sensor/kuna.py
-/custom_components/switch/kuna.py
-```
-4. Proceed with configuration.
+Now, proceed with configuration.
 
 ## Configuration
 
@@ -46,7 +42,7 @@ Where YOUR_EMAIL and YOUR_PASSWORD are the credentials you use to log into the K
 
 ## Updating
 
-To update the custom component, either re-clone this repository or `cd` into the original cloned repo and `git pull`, then copy the latest files into the `custom_components` directory overwriting existing files. If you have no other custom components, you can remove the contents of the directory before copying the files.
+To update the custom component, cd into the `custom_components/kuna directory` and `git pull`.
 
 ## Caveats
 
