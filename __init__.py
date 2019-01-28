@@ -14,7 +14,7 @@ from homeassistant.helpers import discovery
 from homeassistant.helpers.event import track_time_interval
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 
-REQUIREMENTS = ['pykuna==0.1.0']
+REQUIREMENTS = ['pykuna==0.3.0']
 
 _LOGGER = logging.getLogger(__name__)
 
