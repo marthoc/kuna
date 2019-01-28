@@ -27,7 +27,7 @@ CONFIG_SCHEMA = vol.Schema({
     }),
 }, extra=vol.ALLOW_EXTRA)
 
-KUNA_COMPONENTS = ['binary_sensor', 'switch']
+KUNA_COMPONENTS = ['binary_sensor', 'camera', 'switch']
 
 REFRESH_INTERVAL = 15
 
