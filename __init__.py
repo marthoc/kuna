@@ -18,14 +18,19 @@ REQUIREMENTS = ['pykuna==0.3.0']
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = 'kuna'
+
+CONF_STREAM_INTERVAL = 'stream_interval'
 CONF_UPDATE_INTERVAL = 'update_interval'
+
+DEFAULT_STREAM_INTERVAL = 5
 DEFAULT_UPDATE_INTERVAL = 15
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
         vol.Required(CONF_EMAIL): cv.string,
         vol.Required(CONF_PASSWORD): cv.string,
-        vol.Optional(CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL): cv.time_period_seconds
+        vol.Optional(CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL): cv.time_period_seconds,
+        vol.Optional(CONF_STREAM_INTERVAL, default=DEFAULT_STREAM_INTERVAL): cv.time_period_seconds
     }),
 }, extra=vol.ALLOW_EXTRA)
 
@@ -38,9 +43,10 @@ def setup(hass, config):
 
     email = config[DOMAIN][CONF_EMAIL]
     password = config[DOMAIN][CONF_PASSWORD]
+    stream_interval = config[DOMAIN][CONF_STREAM_INTERVAL]
     update_interval = config[DOMAIN][CONF_UPDATE_INTERVAL]
 
-    kuna = KunaAccount(email, password)
+    kuna = KunaAccount(email, password, stream_interval)
 
     try:
         kuna.account.authenticate()
@@ -67,9 +73,10 @@ def setup(hass, config):
 class KunaAccount:
     """Represents a Kuna account."""
 
-    def __init__(self, email, password):
+    def __init__(self, email, password, stream_interval):
         from pykuna import KunaAPI
         self.account = KunaAPI(email, password)
+        self.stream_interval = stream_interval
         self._update_listeners = []
 
     def update(self, *_):
