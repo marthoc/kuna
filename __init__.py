@@ -4,7 +4,6 @@ Support for Kuna (www.getkuna.com).
 For more details about this component, please refer to the documentation at
 https://home-assistant.io/components/kuna/
 """
-from datetime import timedelta
 import logging
 
 import voluptuous as vol
@@ -19,17 +18,18 @@ REQUIREMENTS = ['pykuna==0.3.0']
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = 'kuna'
+CONF_UPDATE_INTERVAL = 'update_interval'
+DEFAULT_UPDATE_INTERVAL = 15
 
 CONFIG_SCHEMA = vol.Schema({
     DOMAIN: vol.Schema({
         vol.Required(CONF_EMAIL): cv.string,
         vol.Required(CONF_PASSWORD): cv.string,
+        vol.Optional(CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL): cv.time_period_seconds
     }),
 }, extra=vol.ALLOW_EXTRA)
 
 KUNA_COMPONENTS = ['binary_sensor', 'camera', 'switch']
-
-REFRESH_INTERVAL = 15
 
 
 def setup(hass, config):
@@ -38,6 +38,7 @@ def setup(hass, config):
 
     email = config[DOMAIN][CONF_EMAIL]
     password = config[DOMAIN][CONF_PASSWORD]
+    update_interval = config[DOMAIN][CONF_UPDATE_INTERVAL]
 
     kuna = KunaAccount(email, password)
 
@@ -58,7 +59,7 @@ def setup(hass, config):
     for component in KUNA_COMPONENTS:
         discovery.load_platform(hass, component, DOMAIN, {}, config)
 
-    track_time_interval(hass, kuna.update, timedelta(seconds=REFRESH_INTERVAL))
+    track_time_interval(hass, kuna.update, update_interval)
 
     return True
 
@@ -74,6 +75,7 @@ class KunaAccount:
     def update(self, *_):
         from pykuna import UnauthorizedError
         try:
+            _LOGGER.debug('Updating Kuna.')
             self.account.update()
             for listener in self._update_listeners:
                 listener()
