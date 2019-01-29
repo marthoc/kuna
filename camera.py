@@ -3,7 +3,6 @@ For more details about this platform, please refer to the documentation at
 https://home-assistant.io/components/binary_sensor.kuna/
 """
 import logging
-from datetime import timedelta
 
 from homeassistant.components.camera import Camera
 from homeassistant.util.dt import utcnow
@@ -37,7 +36,6 @@ class KunaCamera(Camera):
         self._name = '{} Camera'.format(self._camera.name)
         self._unique_id = '{}-Camera'.format(self._camera.serial_number)
         self._last_image = None
-        self._time_between_snapshots = timedelta(seconds=30)
         self._next_snapshot_at = None
 
     @property
@@ -83,9 +81,9 @@ class KunaCamera(Camera):
         return self._next_snapshot_at is None or now > self._next_snapshot_at
 
     def camera_image(self):
-        """Get and return an image from the camera, only once every 30s."""
+        """Get and return an image from the camera, only once every stream_interval seconds."""
         now = utcnow()
         if self._ready_for_snapshot(now):
             self._last_image = self._camera.get_thumbnail()
-            self._next_snapshot_at = now + self._time_between_snapshots
+            self._next_snapshot_at = now + self._account.stream_interval
         return self._last_image
