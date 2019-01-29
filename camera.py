@@ -61,7 +61,7 @@ class KunaCamera(Camera):
     @property
     def is_recording(self):
         """Return the state of the camera."""
-        return self.is_streaming
+        return self._camera.recording_active
 
     def update(self):
         """Read new state data from the updated account camera list."""
