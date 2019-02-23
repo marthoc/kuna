@@ -1,6 +1,6 @@
 """
 For more details about this platform, please refer to the documentation at
-https://home-assistant.io/components/binary_sensor.kuna/
+https://github.com/marthoc/kuna
 """
 import logging
 
@@ -18,9 +18,10 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
 
     devices = []
 
-    for camera in kuna.account.cameras:
+    for camera in kuna.account.cameras.values():
         device = KunaSwitch(kuna, camera)
         devices.append(device)
+        _LOGGER.info('Added switch for Kuna camera: {}'.format(device.name))
 
     add_entities(devices)
 
@@ -58,11 +59,11 @@ class KunaSwitch(SwitchDevice):
         return self._camera.bulb_on
 
     def update(self):
-        """Read new state data from the updated account camera list."""
-        kuna = self._account
-        for camera in kuna.account.cameras:
-            if camera.serial_number == self._original_id:
-                self._camera = camera
+        """Fetch state data from the updated account camera dict."""
+        try:
+            self._camera = self._account.account.cameras[self._original_id]
+        except KeyError:
+            _LOGGER.error('Update failed for {}: camera no longer in Kuna account?'.format(self._original_id))
 
     def update_callback(self):
         """Schedule a state update."""

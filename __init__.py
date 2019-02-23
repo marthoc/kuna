@@ -2,7 +2,7 @@
 Support for Kuna (www.getkuna.com).
 
 For more details about this component, please refer to the documentation at
-https://home-assistant.io/components/kuna/
+https://github.com/marthoc/kuna
 """
 import logging
 
@@ -13,7 +13,7 @@ from homeassistant.helpers import discovery
 from homeassistant.helpers.event import track_time_interval
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 
-REQUIREMENTS = ['pykuna==0.3.0']
+REQUIREMENTS = ['pykuna==0.4.0']
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,6 +35,15 @@ CONFIG_SCHEMA = vol.Schema({
 }, extra=vol.ALLOW_EXTRA)
 
 KUNA_COMPONENTS = ['binary_sensor', 'camera', 'switch']
+
+ATTR_SERIAL_NUMBER = 'serial_number'
+
+SERVICE_ENABLE_NOTIFICATIONS = 'enable_notifications'
+SERVICE_DISABLE_NOTIFICATIONS = 'disable_notifications'
+
+SERVICE_NOTIFICATIONS_SCHEMA = vol.Schema({
+    vol.Optional(ATTR_SERIAL_NUMBER): cv.string
+})
 
 
 def setup(hass, config):
@@ -60,12 +69,50 @@ def setup(hass, config):
         _LOGGER.error('There was an error retrieving cameras from Kuna: {}'.format(err))
         return
 
+    if not kuna.account.cameras:
+        _LOGGER.error('No devices in the Kuna account; aborting component setup.')
+        return
+
     hass.data[DOMAIN] = kuna
 
     for component in KUNA_COMPONENTS:
         discovery.load_platform(hass, component, DOMAIN, {}, config)
 
     track_time_interval(hass, kuna.update, update_interval)
+
+    def enable_notifications(call):
+        serial_number = call.data.get(ATTR_SERIAL_NUMBER)
+        kuna = hass.data[DOMAIN]
+
+        if serial_number is None:
+            for camera in kuna.account.cameras.values():
+                camera.enable_notifications()
+        else:
+            try:
+                kuna.account.cameras[serial_number].enable_notifications()
+            except KeyError:
+                _LOGGER.error(
+                    'Kuna service call error: no camera with serial number \'{}\' in account.'.format(serial_number))
+
+    hass.services.register(
+        DOMAIN, SERVICE_ENABLE_NOTIFICATIONS, enable_notifications, schema=SERVICE_NOTIFICATIONS_SCHEMA)
+
+    def disable_notifications(call):
+        serial_number = call.data.get(ATTR_SERIAL_NUMBER)
+        kuna = hass.data[DOMAIN]
+
+        if serial_number is None:
+            for camera in kuna.account.cameras.values():
+                camera.disable_notifications()
+        else:
+            try:
+                kuna.account.cameras[serial_number].disable_notifications()
+            except KeyError:
+                _LOGGER.error(
+                    'Kuna service call error: no camera with serial number \'{}\' in account.'.format(serial_number))
+
+    hass.services.register(
+        DOMAIN, SERVICE_DISABLE_NOTIFICATIONS, disable_notifications, schema=SERVICE_NOTIFICATIONS_SCHEMA)
 
     return True
 
@@ -87,7 +134,7 @@ class KunaAccount:
             for listener in self._update_listeners:
                 listener()
         except UnauthorizedError:
-            _LOGGER.error('Kuna API authorization error. Attempting to refresh token...')
+            _LOGGER.error('Kuna API authorization error. Refreshing token...')
             self.account.authenticate()
 
     def add_update_listener(self, listener):
