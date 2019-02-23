@@ -36,6 +36,7 @@ CONFIG_SCHEMA = vol.Schema({
 
 KUNA_COMPONENTS = ['binary_sensor', 'camera', 'switch']
 
+ATTR_SERIAL_NUMBER = 'serial_number'
 
 def setup(hass, config):
     """Set up Kuna."""

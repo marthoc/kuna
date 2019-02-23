@@ -6,9 +6,12 @@ import logging
 
 from homeassistant.components.camera import Camera
 from homeassistant.util.dt import utcnow
-from . import DOMAIN
+from . import DOMAIN, ATTR_SERIAL_NUMBER
 
 DEPENDENCIES = ['kuna']
+
+ATTR_NOTIFICATIONS_ENABLED = 'notifications_enabled'
+ATTR_VOLUME = 'volume'
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,6 +64,15 @@ class KunaCamera(Camera):
     def is_recording(self):
         """Return the state of the camera."""
         return self._camera.recording_active
+
+    @property
+    def device_state_attributes(self):
+        attributes = {
+            ATTR_SERIAL_NUMBER: self._camera.serial_number,
+            ATTR_NOTIFICATIONS_ENABLED: self._camera.notifications_enabled,
+            ATTR_VOLUME: self._camera.volume
+        }
+        return attributes
 
     def update(self):
         """Fetch state data from the updated account camera dict."""
