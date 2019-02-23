@@ -1,0 +1,17 @@
+enable_notifications:
+  description: >-
+    Enable notifications for a Kuna camera in the account configured in Home Assistant,
+    or all cameras in the account when serial number is omitted from the service call.
+  fields:
+    serial_number:
+      description: Serial number of a Kuna camera.
+      example: 'OOKNBL000000000000'
+
+disable_notifications:
+  description: >-
+    Disable notifications for a Kuna camera in the account configured in Home Assistant,
+    or all cameras in the account when serial number is omitted from the service call.
+  fields:
+    serial_number:
+      description: Serial number of a Kuna camera.
+      example: 'OOKNBL000000000000'

@@ -38,6 +38,14 @@ KUNA_COMPONENTS = ['binary_sensor', 'camera', 'switch']
 
 ATTR_SERIAL_NUMBER = 'serial_number'
 
+SERVICE_ENABLE_NOTIFICATIONS = 'enable_notifications'
+SERVICE_DISABLE_NOTIFICATIONS = 'disable_notifications'
+
+SERVICE_NOTIFICATIONS_SCHEMA = vol.Schema({
+    vol.Optional(ATTR_SERIAL_NUMBER): cv.string
+})
+
+
 def setup(hass, config):
     """Set up Kuna."""
     from pykuna import AuthenticationError, UnauthorizedError
@@ -71,6 +79,40 @@ def setup(hass, config):
         discovery.load_platform(hass, component, DOMAIN, {}, config)
 
     track_time_interval(hass, kuna.update, update_interval)
+
+    def enable_notifications(call):
+        serial_number = call.data.get(ATTR_SERIAL_NUMBER)
+        kuna = hass.data[DOMAIN]
+
+        if serial_number is None:
+            for camera in kuna.account.cameras.values():
+                camera.enable_notifications()
+        else:
+            try:
+                kuna.account.cameras[serial_number].enable_notifications()
+            except KeyError:
+                _LOGGER.error(
+                    'Kuna service call error: no camera with serial number \'{}\' in account.'.format(serial_number))
+
+    hass.services.register(
+        DOMAIN, SERVICE_ENABLE_NOTIFICATIONS, enable_notifications, schema=SERVICE_NOTIFICATIONS_SCHEMA)
+
+    def disable_notifications(call):
+        serial_number = call.data.get(ATTR_SERIAL_NUMBER)
+        kuna = hass.data[DOMAIN]
+
+        if serial_number is None:
+            for camera in kuna.account.cameras.values():
+                camera.disable_notifications()
+        else:
+            try:
+                kuna.account.cameras[serial_number].disable_notifications()
+            except KeyError:
+                _LOGGER.error(
+                    'Kuna service call error: no camera with serial number \'{}\' in account.'.format(serial_number))
+
+    hass.services.register(
+        DOMAIN, SERVICE_DISABLE_NOTIFICATIONS, disable_notifications, schema=SERVICE_NOTIFICATIONS_SCHEMA)
 
     return True
 
