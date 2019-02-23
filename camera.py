@@ -1,6 +1,6 @@
 """
 For more details about this platform, please refer to the documentation at
-https://home-assistant.io/components/binary_sensor.kuna/
+https://github.com/marthoc/kuna
 """
 import logging
 
