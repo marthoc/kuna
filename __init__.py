@@ -13,7 +13,7 @@ from homeassistant.helpers import discovery
 from homeassistant.helpers.event import track_time_interval
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 
-REQUIREMENTS = ['pykuna==0.3.0']
+REQUIREMENTS = ['pykuna==0.4.0']
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,6 +60,10 @@ def setup(hass, config):
         _LOGGER.error('There was an error retrieving cameras from Kuna: {}'.format(err))
         return
 
+    if not kuna.account.cameras:
+        _LOGGER.error('No devices in the Kuna account; aborting component setup.')
+        return
+
     hass.data[DOMAIN] = kuna
 
     for component in KUNA_COMPONENTS:
@@ -87,7 +91,7 @@ class KunaAccount:
             for listener in self._update_listeners:
                 listener()
         except UnauthorizedError:
-            _LOGGER.error('Kuna API authorization error. Attempting to refresh token...')
+            _LOGGER.error('Kuna API authorization error. Refreshing token...')
             self.account.authenticate()
 
     def add_update_listener(self, listener):
