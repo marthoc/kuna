@@ -8,10 +8,10 @@ from homeassistant.components.camera import Camera
 from homeassistant.util.dt import utcnow
 from . import DOMAIN, ATTR_SERIAL_NUMBER
 
-DEPENDENCIES = ['kuna']
+DEPENDENCIES = ["kuna"]
 
-ATTR_NOTIFICATIONS_ENABLED = 'notifications_enabled'
-ATTR_VOLUME = 'volume'
+ATTR_NOTIFICATIONS_ENABLED = "notifications_enabled"
+ATTR_VOLUME = "volume"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,20 +25,19 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     for camera in kuna.account.cameras.values():
         device = KunaCamera(kuna, camera)
         devices.append(device)
-        _LOGGER.info('Added camera for Kuna camera: {}'.format(device.name))
+        _LOGGER.info("Added camera for Kuna camera: {}".format(device.name))
 
     add_entities(devices, True)
 
 
 class KunaCamera(Camera):
-
     def __init__(self, kuna, camera):
         super().__init__()
         self._account = kuna
         self._camera = camera
         self._original_id = self._camera.serial_number
-        self._name = '{} Camera'.format(self._camera.name)
-        self._unique_id = '{}-Camera'.format(self._camera.serial_number)
+        self._name = "{} Camera".format(self._camera.name)
+        self._unique_id = "{}-Camera".format(self._camera.serial_number)
         self._last_image = None
         self._next_snapshot_at = None
 
@@ -58,7 +57,7 @@ class KunaCamera(Camera):
 
     @property
     def brand(self):
-        return 'Kuna'
+        return "Kuna"
 
     @property
     def is_recording(self):
@@ -70,7 +69,7 @@ class KunaCamera(Camera):
         attributes = {
             ATTR_SERIAL_NUMBER: self._camera.serial_number,
             ATTR_NOTIFICATIONS_ENABLED: self._camera.notifications_enabled,
-            ATTR_VOLUME: self._camera.volume
+            ATTR_VOLUME: self._camera.volume,
         }
         return attributes
 
@@ -80,7 +79,11 @@ class KunaCamera(Camera):
         try:
             self._camera = self._account.account.cameras[self._original_id]
         except KeyError:
-            _LOGGER.error('Update failed for {}: camera no longer in Kuna account?'.format(self._original_id))
+            _LOGGER.error(
+                "Update failed for {}: camera no longer in Kuna account?".format(
+                    self._original_id
+                )
+            )
 
     def update_callback(self):
         """Schedule a state update."""

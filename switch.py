@@ -7,7 +7,7 @@ import logging
 from homeassistant.components.switch import SwitchDevice
 from . import DOMAIN
 
-DEPENDENCIES = ['kuna']
+DEPENDENCIES = ["kuna"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -21,19 +21,18 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
     for camera in kuna.account.cameras.values():
         device = KunaSwitch(kuna, camera)
         devices.append(device)
-        _LOGGER.info('Added switch for Kuna camera: {}'.format(device.name))
+        _LOGGER.info("Added switch for Kuna camera: {}".format(device.name))
 
     add_entities(devices)
 
 
 class KunaSwitch(SwitchDevice):
-
     def __init__(self, kuna, camera):
         self._account = kuna
         self._camera = camera
         self._original_id = self._camera.serial_number
-        self._name = '{} Switch'.format(self._camera.name)
-        self._unique_id = '{}-Switch'.format(self._camera.serial_number)
+        self._name = "{} Switch".format(self._camera.name)
+        self._unique_id = "{}-Switch".format(self._camera.serial_number)
 
     @property
     def available(self):
@@ -63,7 +62,11 @@ class KunaSwitch(SwitchDevice):
         try:
             self._camera = self._account.account.cameras[self._original_id]
         except KeyError:
-            _LOGGER.error('Update failed for {}: camera no longer in Kuna account?'.format(self._original_id))
+            _LOGGER.error(
+                "Update failed for {}: camera no longer in Kuna account?".format(
+                    self._original_id
+                )
+            )
 
     def update_callback(self):
         """Schedule a state update."""
