@@ -12,7 +12,7 @@ DEPENDENCIES = ["kuna"]
 _LOGGER = logging.getLogger(__name__)
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
 
     kuna = hass.data[DOMAIN]
 
@@ -23,7 +23,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         devices.append(device)
         _LOGGER.info("Added binary sensor for Kuna camera: {}".format(device.name))
 
-    add_entities(devices)
+    async_add_entities(devices, True)
 
 
 class KunaBinarySensor(BinarySensorDevice):

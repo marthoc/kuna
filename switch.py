@@ -12,7 +12,7 @@ DEPENDENCIES = ["kuna"]
 _LOGGER = logging.getLogger(__name__)
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
 
     kuna = hass.data[DOMAIN]
 
@@ -23,7 +23,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         devices.append(device)
         _LOGGER.info("Added switch for Kuna camera: {}".format(device.name))
 
-    add_entities(devices)
+    async_add_entities(devices, True)
 
 
 class KunaSwitch(SwitchDevice):
@@ -76,12 +76,12 @@ class KunaSwitch(SwitchDevice):
         """Add callback after being added to hass."""
         self._account.add_update_listener(self.update_callback)
 
-    def turn_on(self, **kwargs):
+    async def turn_on(self, **kwargs):
         """Turn the switch on."""
-        self._camera.light_on()
-        self._account.update()
+        await self._camera.light_on()
+        await self._account.update()
 
-    def turn_off(self, **kwargs):
+    async def turn_off(self, **kwargs):
         """Turn the device off."""
-        self._camera.light_off()
-        self._account.update()
+        await self._camera.light_off()
+        await self._account.update()

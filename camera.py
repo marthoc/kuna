@@ -5,10 +5,12 @@ https://github.com/marthoc/kuna
 import logging
 
 from homeassistant.components.camera import Camera
+from homeassistant.components.ffmpeg import DATA_FFMPEG
 from homeassistant.util.dt import utcnow
 from . import DOMAIN, ATTR_SERIAL_NUMBER
 
-DEPENDENCIES = ["kuna"]
+
+DEPENDENCIES = ["kuna", "ffmpeg"]
 
 ATTR_NOTIFICATIONS_ENABLED = "notifications_enabled"
 ATTR_VOLUME = "volume"
@@ -16,7 +18,7 @@ ATTR_VOLUME = "volume"
 _LOGGER = logging.getLogger(__name__)
 
 
-def setup_platform(hass, config, add_entities, discovery_info=None):
+async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
 
     kuna = hass.data[DOMAIN]
 
@@ -27,7 +29,7 @@ def setup_platform(hass, config, add_entities, discovery_info=None):
         devices.append(device)
         _LOGGER.info("Added camera for Kuna camera: {}".format(device.name))
 
-    add_entities(devices, True)
+    async_add_entities(devices, True)
 
 
 class KunaCamera(Camera):
@@ -96,10 +98,10 @@ class KunaCamera(Camera):
     def _ready_for_snapshot(self, now):
         return self._next_snapshot_at is None or now > self._next_snapshot_at
 
-    def camera_image(self):
+    async def camera_image(self):
         """Get and return an image from the camera, only once every stream_interval seconds."""
         now = utcnow()
         if self._ready_for_snapshot(now):
-            self._last_image = self._camera.get_thumbnail()
+            self._last_image = await self._camera.get_thumbnail()
             self._next_snapshot_at = now + self._account.stream_interval
         return self._last_image

@@ -8,9 +8,10 @@ import logging
 
 import voluptuous as vol
 
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers import discovery
-from homeassistant.helpers.event import track_time_interval
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 
 REQUIREMENTS = ["pykuna==0.5.0"]
@@ -53,7 +54,7 @@ SERVICE_DISABLE_NOTIFICATIONS = "disable_notifications"
 SERVICE_NOTIFICATIONS_SCHEMA = vol.Schema({vol.Optional(ATTR_SERIAL_NUMBER): cv.string})
 
 
-def setup(hass, config):
+async def async_setup(hass, config):
     """Set up Kuna."""
     from pykuna import AuthenticationError, UnauthorizedError
 
@@ -62,16 +63,16 @@ def setup(hass, config):
     stream_interval = config[DOMAIN][CONF_STREAM_INTERVAL]
     update_interval = config[DOMAIN][CONF_UPDATE_INTERVAL]
 
-    kuna = KunaAccount(email, password, stream_interval)
+    kuna = KunaAccount(email, password, async_get_clientsession(hass), stream_interval)
 
     try:
-        kuna.account.authenticate()
+        await kuna.account.authenticate()
     except AuthenticationError as err:
         _LOGGER.error("There was an error logging into Kuna: {}".format(err))
         return
 
     try:
-        kuna.account.update()
+        await kuna.account.update()
     except UnauthorizedError as err:
         _LOGGER.error("There was an error retrieving cameras from Kuna: {}".format(err))
         return
@@ -83,20 +84,20 @@ def setup(hass, config):
     hass.data[DOMAIN] = kuna
 
     for component in KUNA_COMPONENTS:
-        discovery.load_platform(hass, component, DOMAIN, {}, config)
+        hass.async_create_task(discovery.async_load_platform(hass, component, DOMAIN, {}, config))
 
-    track_time_interval(hass, kuna.update, update_interval)
+    async_track_time_interval(hass, kuna.update, update_interval)
 
-    def enable_notifications(call):
+    async def enable_notifications(call):
         serial_number = call.data.get(ATTR_SERIAL_NUMBER)
         kuna = hass.data[DOMAIN]
 
         if serial_number is None:
             for camera in kuna.account.cameras.values():
-                camera.enable_notifications()
+                await camera.enable_notifications()
         else:
             try:
-                kuna.account.cameras[serial_number].enable_notifications()
+                await kuna.account.cameras[serial_number].enable_notifications()
             except KeyError:
                 _LOGGER.error(
                     "Kuna service call error: no camera with serial number '{}' in account.".format(
@@ -104,23 +105,23 @@ def setup(hass, config):
                     )
                 )
 
-    hass.services.register(
+    hass.services.async_register(
         DOMAIN,
         SERVICE_ENABLE_NOTIFICATIONS,
         enable_notifications,
         schema=SERVICE_NOTIFICATIONS_SCHEMA,
     )
 
-    def disable_notifications(call):
+    async def disable_notifications(call):
         serial_number = call.data.get(ATTR_SERIAL_NUMBER)
         kuna = hass.data[DOMAIN]
 
         if serial_number is None:
             for camera in kuna.account.cameras.values():
-                camera.disable_notifications()
+                await camera.disable_notifications()
         else:
             try:
-                kuna.account.cameras[serial_number].disable_notifications()
+                await kuna.account.cameras[serial_number].disable_notifications()
             except KeyError:
                 _LOGGER.error(
                     "Kuna service call error: no camera with serial number '{}' in account.".format(
@@ -128,7 +129,7 @@ def setup(hass, config):
                     )
                 )
 
-    hass.services.register(
+    hass.services.async_register(
         DOMAIN,
         SERVICE_DISABLE_NOTIFICATIONS,
         disable_notifications,
@@ -140,25 +141,24 @@ def setup(hass, config):
 
 class KunaAccount:
     """Represents a Kuna account."""
-
-    def __init__(self, email, password, stream_interval):
+    def __init__(self, email, password, websession, stream_interval):
         from pykuna import KunaAPI
 
-        self.account = KunaAPI(email, password)
+        self.account = KunaAPI(email, password, websession)
         self.stream_interval = stream_interval
         self._update_listeners = []
 
-    def update(self, *_):
+    async def update(self, *_):
         from pykuna import UnauthorizedError
 
         try:
             _LOGGER.debug("Updating Kuna.")
-            self.account.update()
+            await self.account.update()
             for listener in self._update_listeners:
                 listener()
         except UnauthorizedError:
             _LOGGER.error("Kuna API authorization error. Refreshing token...")
-            self.account.authenticate()
+            await self.account.authenticate()
 
     def add_update_listener(self, listener):
         self._update_listeners.append(listener)
