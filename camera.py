@@ -5,12 +5,11 @@ https://github.com/marthoc/kuna
 import logging
 
 from homeassistant.components.camera import Camera
-from homeassistant.components.ffmpeg import DATA_FFMPEG
 from homeassistant.util.dt import utcnow
 from . import DOMAIN, ATTR_SERIAL_NUMBER
 
 
-DEPENDENCIES = ["kuna", "ffmpeg"]
+DEPENDENCIES = ["kuna"]
 
 ATTR_NOTIFICATIONS_ENABLED = "notifications_enabled"
 ATTR_VOLUME = "volume"
