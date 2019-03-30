@@ -19,7 +19,7 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
 )
 
-REQUIREMENTS = ["pykuna==0.5.0"]
+REQUIREMENTS = ["pykuna==0.5.1"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -210,6 +210,7 @@ class KunaAccount:
             if url is not None:
                 event_data = {
                     "category": "recording",
+                    "camera_name": self.account.cameras[recording.camera["serial_number"]].name,
                     "serial_number": recording.camera["serial_number"],
                     "label": recording.label,
                     "timestamp": recording.timestamp,
