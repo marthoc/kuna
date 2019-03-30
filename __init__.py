@@ -210,6 +210,7 @@ class KunaAccount:
             if url is not None:
                 event_data = {
                     "category": "recording",
+                    "camera_name": self.account.cameras[recording.camera["serial_number"]].name,
                     "serial_number": recording.camera["serial_number"],
                     "label": recording.label,
                     "timestamp": recording.timestamp,
