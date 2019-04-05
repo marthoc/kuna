@@ -7,7 +7,6 @@ import logging
 from homeassistant.components.binary_sensor import BinarySensorDevice
 from . import DOMAIN
 
-DEPENDENCIES = ["kuna"]
 
 _LOGGER = logging.getLogger(__name__)
 

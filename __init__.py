@@ -19,8 +19,6 @@ from homeassistant.const import (
     EVENT_HOMEASSISTANT_START,
 )
 
-REQUIREMENTS = ["pykuna==0.5.1"]
-
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = "kuna"
@@ -66,8 +64,6 @@ SERVICE_NOTIFICATIONS_SCHEMA = vol.Schema({vol.Optional(ATTR_SERIAL_NUMBER): cv.
 
 async def async_setup(hass, config):
     """Set up Kuna."""
-    from pykuna import AuthenticationError, UnauthorizedError
-
     email = config[DOMAIN][CONF_EMAIL]
     password = config[DOMAIN][CONF_PASSWORD]
     recording_interval = config[DOMAIN][CONF_RECORDING_INTERVAL]
@@ -83,21 +79,14 @@ async def async_setup(hass, config):
         stream_interval,
     )
 
-    try:
-        await kuna.account.authenticate()
-    except AuthenticationError as err:
-        _LOGGER.error("There was an error logging into Kuna: {}".format(err))
-        return
+    if not await kuna.authenticate():
+        return False
 
-    try:
-        await kuna.account.update()
-    except UnauthorizedError as err:
-        _LOGGER.error("There was an error retrieving cameras from Kuna: {}".format(err))
-        return
+    await kuna.account.update()
 
     if not kuna.account.cameras:
         _LOGGER.error("No devices in the Kuna account; aborting component setup.")
-        return
+        return False
 
     hass.data[DOMAIN] = kuna
 
@@ -169,7 +158,7 @@ class KunaAccount:
     def __init__(
         self, hass, email, password, websession, recording_interval, stream_interval
     ):
-        from pykuna import KunaAPI
+        from .pykuna import KunaAPI
 
         self._hass = hass
         self.account = KunaAPI(email, password, websession)
@@ -178,7 +167,7 @@ class KunaAccount:
         self._update_listeners = []
 
     async def update(self, *_):
-        from pykuna import UnauthorizedError
+        from .pykuna import UnauthorizedError
 
         try:
             _LOGGER.debug("Updating Kuna.")
@@ -187,7 +176,22 @@ class KunaAccount:
                 listener()
         except UnauthorizedError:
             _LOGGER.error("Kuna API authorization error. Refreshing token...")
-            await self.account.authenticate()
+            await self.authenticate()
+
+    async def authenticate(self) -> bool:
+        from async_timeout import timeout
+        from asyncio import TimeoutError
+
+        async with timeout(10):
+            try:
+                await self.account.authenticate()
+                return True
+            except TimeoutError:
+                _LOGGER.error("Timeout while authenticating Kuna.")
+                return False
+            except Exception as err:
+                _LOGGER.error("Error while authenticating Kuna: {}".format(err))
+                return False
 
     def add_update_listener(self, listener):
         self._update_listeners.append(listener)

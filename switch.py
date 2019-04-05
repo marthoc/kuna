@@ -7,7 +7,6 @@ import logging
 from homeassistant.components.switch import SwitchDevice
 from . import DOMAIN
 
-DEPENDENCIES = ["kuna"]
 
 _LOGGER = logging.getLogger(__name__)
 
