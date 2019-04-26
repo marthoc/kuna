@@ -182,7 +182,7 @@ class KunaAccount:
         from async_timeout import timeout
         from asyncio import TimeoutError
 
-        async with timeout(10):
+        async with timeout(30):
             try:
                 await self.account.authenticate()
                 return True
