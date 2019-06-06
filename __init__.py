@@ -192,7 +192,6 @@ class KunaAccount:
             except Exception as err:
                 _LOGGER.error("Error while authenticating Kuna: {}".format(err))
                 raise err
-                return False
 
     def add_update_listener(self, listener):
         self._update_listeners.append(listener)
