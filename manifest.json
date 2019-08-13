@@ -1,0 +1,8 @@
+{
+  "domain": "kuna",
+  "name": "Kuna",
+  "documentation": "https://github.com/marthoc/kuna",
+  "dependencies": [],
+  "codeowners": ["@marthoc"],
+  "requirements": []
+}
