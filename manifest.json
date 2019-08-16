@@ -1,6 +1,7 @@
 {
   "domain": "kuna",
   "name": "Kuna",
+  "config_flow": true,
   "documentation": "https://github.com/marthoc/kuna",
   "dependencies": [],
   "codeowners": ["@marthoc"],

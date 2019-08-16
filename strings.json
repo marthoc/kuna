@@ -1,0 +1,21 @@
+{
+    "config": {
+        "title": "Kuna",
+        "step": {
+            "user": {
+                "title": "Kuna Smart Home Security",
+                "description": "See https://github.com/marthoc/kuna for more information on configuring this integration.",
+                "data": {
+                    "email": "E-mail Address",
+                    "password": "Password",
+                    "update_interval": "Update Interval",
+                    "stream_interval": "Stream Interval",
+                    "recording_interval": "Recording Interval"
+                }
+            }
+        },
+        "abort": {
+            "one_instance_only": "This component currently supports only one Kuna instance."
+        }
+    }
+}

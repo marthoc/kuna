@@ -4,13 +4,21 @@ Support for Kuna (www.getkuna.com).
 For more details about this component, please refer to the documentation at
 https://github.com/marthoc/kuna
 """
+from datetime import timedelta
 import logging
 
 import voluptuous as vol
 
+from .const import (
+    ATTR_SERIAL_NUMBER,
+    CONF_RECORDING_INTERVAL,
+    CONF_STREAM_INTERVAL,
+    CONF_UPDATE_INTERVAL,
+    DOMAIN,
+)
+
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
-import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers import discovery
+from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.const import (
     CONF_EMAIL,
@@ -21,40 +29,7 @@ from homeassistant.const import (
 
 _LOGGER = logging.getLogger(__name__)
 
-DOMAIN = "kuna"
-
-CONF_RECORDING_INTERVAL = "recording_interval"
-CONF_STREAM_INTERVAL = "stream_interval"
-CONF_UPDATE_INTERVAL = "update_interval"
-
-DEFAULT_RECORDING_INTERVAL = 7200
-DEFAULT_STREAM_INTERVAL = 5
-DEFAULT_UPDATE_INTERVAL = 15
-
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_EMAIL): cv.string,
-                vol.Required(CONF_PASSWORD): cv.string,
-                vol.Optional(
-                    CONF_RECORDING_INTERVAL, default=DEFAULT_RECORDING_INTERVAL
-                ): cv.time_period_seconds,
-                vol.Optional(
-                    CONF_STREAM_INTERVAL, default=DEFAULT_STREAM_INTERVAL
-                ): cv.time_period_seconds,
-                vol.Optional(
-                    CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
-                ): cv.time_period_seconds,
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
-)
-
 KUNA_COMPONENTS = ["binary_sensor", "camera", "switch"]
-
-ATTR_SERIAL_NUMBER = "serial_number"
 
 SERVICE_ENABLE_NOTIFICATIONS = "enable_notifications"
 SERVICE_DISABLE_NOTIFICATIONS = "disable_notifications"
@@ -63,12 +38,23 @@ SERVICE_NOTIFICATIONS_SCHEMA = vol.Schema({vol.Optional(ATTR_SERIAL_NUMBER): cv.
 
 
 async def async_setup(hass, config):
-    """Set up Kuna."""
-    email = config[DOMAIN][CONF_EMAIL]
-    password = config[DOMAIN][CONF_PASSWORD]
-    recording_interval = config[DOMAIN][CONF_RECORDING_INTERVAL]
-    stream_interval = config[DOMAIN][CONF_STREAM_INTERVAL]
-    update_interval = config[DOMAIN][CONF_UPDATE_INTERVAL]
+    """Kuna only uses config flow for configuration."""
+    return True
+
+
+async def async_setup_entry(hass, entry):
+    """Set up Kuna from a config entry."""
+
+    if DOMAIN not in hass.data:
+        hass.data[DOMAIN] = {}
+
+    config = entry.data
+
+    email = config[CONF_EMAIL]
+    password = config[CONF_PASSWORD]
+    recording_interval = timedelta(seconds=config[CONF_RECORDING_INTERVAL])
+    stream_interval = timedelta(seconds=config[CONF_STREAM_INTERVAL])
+    update_interval = timedelta(seconds=config[CONF_UPDATE_INTERVAL])
 
     kuna = KunaAccount(
         hass,
@@ -92,7 +78,7 @@ async def async_setup(hass, config):
 
     for component in KUNA_COMPONENTS:
         hass.async_create_task(
-            discovery.async_load_platform(hass, component, DOMAIN, {}, config)
+            hass.config_entries.async_forward_entry_setup(entry, component)
         )
 
     async_track_time_interval(hass, kuna.update, update_interval)
@@ -163,7 +149,6 @@ class KunaAccount:
         self._hass = hass
         self.account = KunaAPI(email, password, websession)
         self._recording_interval = recording_interval
-        self.stream_interval = stream_interval
         self._update_listeners = []
 
     async def update(self, *_):
@@ -214,7 +199,9 @@ class KunaAccount:
             if url is not None:
                 event_data = {
                     "category": "recording",
-                    "camera_name": self.account.cameras[recording.camera["serial_number"]].name,
+                    "camera_name": self.account.cameras[
+                        recording.camera["serial_number"]
+                    ].name,
                     "serial_number": recording.camera["serial_number"],
                     "label": recording.label,
                     "timestamp": recording.timestamp,
