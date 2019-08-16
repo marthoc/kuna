@@ -37,7 +37,7 @@ class KunaFlowHandler(config_entries.ConfigFlow):
 
         if user_input is not None:
             return self.async_create_entry(
-                title="Kuna",
+                title=user_input[CONF_EMAIL],
                 data={
                     CONF_EMAIL: user_input[CONF_EMAIL],
                     CONF_PASSWORD: user_input[CONF_PASSWORD],
