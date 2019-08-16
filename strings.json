@@ -1,6 +1,6 @@
 {
     "config": {
-        "title": "Kuna",
+        "title": "Kuna Smart Home Security",
         "step": {
             "user": {
                 "title": "Kuna Smart Home Security",
@@ -15,7 +15,7 @@
             }
         },
         "abort": {
-            "one_instance_only": "This component currently supports only one Kuna instance."
+            "one_instance_only": "This integration currently supports only one Kuna instance."
         }
     }
 }
