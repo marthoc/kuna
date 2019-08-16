@@ -36,9 +36,9 @@ The following options can be configured when setting up the integration:
 |------------------|-------------------|---------|-------------|
 | email            | Required          | N/A     | The email address used to log into the Kuna app. |
 | password         | Required          | N/A     | The password used to log into the Kuna app. |
-| update_interval  | Optional          | 15      | The frequency, in seconds, that the component polls the Kuna server for updates. |
-| stream_interval  | Optional          | 5       | The frequency, in seconds, that the camera's frontend streaming view will refresh its image. |
 | recording_interval | Optional        | 7200    | The frequency, in seconds, that the component checks for new recordings for each camera. |
+| stream_interval  | Optional          | 5       | The frequency, in seconds, that the camera's frontend streaming view will refresh its image. |
+| update_interval  | Optional          | 15      | The frequency, in seconds, that the component polls the Kuna server for updates. |
 
 
 ## Updating
