@@ -5,7 +5,7 @@ https://github.com/marthoc/kuna
 import logging
 
 from homeassistant.components.binary_sensor import BinarySensorDevice
-from .const import DOMAIN
+from .const import DOMAIN, MANUFACTURER
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -67,6 +67,16 @@ class KunaBinarySensor(BinarySensorDevice):
     def is_on(self):
         """Return the state of the binary sensor."""
         return self._camera.recording_active
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self._camera.serial_number)},
+            "name": self._camera.name,
+            "manufacturer": MANUFACTURER,
+            "model": "Camera",
+            "sw_version": self._camera.build,
+        }
 
     def update(self):
         """Fetch state data from the updated account camera dict."""

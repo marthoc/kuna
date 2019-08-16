@@ -7,7 +7,14 @@ import logging
 
 from homeassistant.components.camera import Camera
 from homeassistant.util.dt import utcnow
-from .const import DOMAIN, ATTR_NOTIFICATIONS_ENABLED, ATTR_SERIAL_NUMBER, ATTR_VOLUME, CONF_STREAM_INTERVAL
+from .const import (
+    DOMAIN,
+    ATTR_NOTIFICATIONS_ENABLED,
+    ATTR_SERIAL_NUMBER,
+    ATTR_VOLUME,
+    CONF_STREAM_INTERVAL,
+    MANUFACTURER,
+)
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -77,6 +84,16 @@ class KunaCamera(Camera):
     def is_recording(self):
         """Return the state of the camera."""
         return self._camera.recording_active
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self._camera.serial_number)},
+            "name": self._camera.name,
+            "manufacturer": MANUFACTURER,
+            "model": "Camera",
+            "sw_version": self._camera.build,
+        }
 
     @property
     def device_state_attributes(self):
