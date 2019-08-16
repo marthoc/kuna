@@ -16,6 +16,7 @@ from .const import (
 
 from homeassistant import config_entries
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -31,21 +32,39 @@ class KunaFlowHandler(config_entries.ConfigFlow):
         """Initialize the Kuna config flow."""
 
     async def async_step_user(self, user_input=None):
-        """Handle the flow."""
+        """Handle a user initiated flow."""
+        errors = {}
+
         if self._async_current_entries():
+            """Config entry currently exists, only one allowed."""
             return self.async_abort(reason="one_instance_only")
 
         if user_input is not None:
-            return self.async_create_entry(
-                title=user_input[CONF_EMAIL],
-                data={
-                    CONF_EMAIL: user_input[CONF_EMAIL],
-                    CONF_PASSWORD: user_input[CONF_PASSWORD],
-                    CONF_UPDATE_INTERVAL: user_input[CONF_UPDATE_INTERVAL],
-                    CONF_STREAM_INTERVAL: user_input[CONF_STREAM_INTERVAL],
-                    CONF_RECORDING_INTERVAL: user_input[CONF_RECORDING_INTERVAL],
-                },
+            """Validate the username and password by attempting to authenticate."""
+            from . import KunaAccount
+
+            kuna = KunaAccount(
+                self.hass,
+                user_input[CONF_EMAIL],
+                user_input[CONF_PASSWORD],
+                async_get_clientsession(self.hass),
+                user_input[CONF_RECORDING_INTERVAL],
             )
+            if not await kuna.authenticate():
+                """Authenticate has failed due to bad credentials or timeout."""
+                errors["base"] = "auth_failed"
+            else:
+                """Authenticate is successful, create the config entry."""
+                return self.async_create_entry(
+                    title=user_input[CONF_EMAIL],
+                    data={
+                        CONF_EMAIL: user_input[CONF_EMAIL],
+                        CONF_PASSWORD: user_input[CONF_PASSWORD],
+                        CONF_UPDATE_INTERVAL: user_input[CONF_UPDATE_INTERVAL],
+                        CONF_STREAM_INTERVAL: user_input[CONF_STREAM_INTERVAL],
+                        CONF_RECORDING_INTERVAL: user_input[CONF_RECORDING_INTERVAL],
+                    },
+                )
 
         data_schema = OrderedDict()
         data_schema[vol.Required(CONF_EMAIL)] = str
@@ -60,4 +79,6 @@ class KunaFlowHandler(config_entries.ConfigFlow):
             vol.Optional(CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL)
         ] = int
 
-        return self.async_show_form(step_id="user", data_schema=vol.Schema(data_schema))
+        return self.async_show_form(
+            step_id="user", data_schema=vol.Schema(data_schema), errors=errors
+        )

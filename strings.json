@@ -14,6 +14,9 @@
                 }
             }
         },
+        "error": {
+            "auth_failed": "Authentication failed: bad login or timeout. Check e-mail and password, and try again."
+        },
         "abort": {
             "one_instance_only": "This integration currently supports only one Kuna instance."
         }

@@ -53,16 +53,10 @@ async def async_setup_entry(hass, entry):
     email = config[CONF_EMAIL]
     password = config[CONF_PASSWORD]
     recording_interval = timedelta(seconds=config[CONF_RECORDING_INTERVAL])
-    stream_interval = timedelta(seconds=config[CONF_STREAM_INTERVAL])
     update_interval = timedelta(seconds=config[CONF_UPDATE_INTERVAL])
 
     kuna = KunaAccount(
-        hass,
-        email,
-        password,
-        async_get_clientsession(hass),
-        recording_interval,
-        stream_interval,
+        hass, email, password, async_get_clientsession(hass), recording_interval
     )
 
     if not await kuna.authenticate():
@@ -141,9 +135,7 @@ async def async_setup_entry(hass, entry):
 class KunaAccount:
     """Represents a Kuna account."""
 
-    def __init__(
-        self, hass, email, password, websession, recording_interval, stream_interval
-    ):
+    def __init__(self, hass, email, password, websession, recording_interval):
         from .pykuna import KunaAPI
 
         self._hass = hass
@@ -176,7 +168,7 @@ class KunaAccount:
                 return False
             except Exception as err:
                 _LOGGER.error("Error while authenticating Kuna: {}".format(err))
-                raise err
+                return False
 
     def add_update_listener(self, listener):
         self._update_listeners.append(listener)
