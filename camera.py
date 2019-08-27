@@ -21,17 +21,8 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
-
-    kuna = hass.data[DOMAIN]
-
-    devices = []
-
-    for camera in kuna.account.cameras.values():
-        device = KunaCamera(kuna, camera)
-        devices.append(device)
-        _LOGGER.info("Added camera for Kuna camera: {}".format(device.name))
-
-    async_add_entities(devices, True)
+    """Kuna only uses config flow for configuration."""
+    pass
 
 
 async def async_setup_entry(hass, config_entry, async_add_entities):
