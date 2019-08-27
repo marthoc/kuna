@@ -12,7 +12,6 @@ import voluptuous as vol
 from .const import (
     ATTR_SERIAL_NUMBER,
     CONF_RECORDING_INTERVAL,
-    CONF_STREAM_INTERVAL,
     CONF_UPDATE_INTERVAL,
     DOMAIN,
 )
