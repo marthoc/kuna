@@ -5,13 +5,19 @@ https://github.com/marthoc/kuna
 import logging
 
 from homeassistant.components.switch import SwitchDevice
-from . import DOMAIN
+from .const import DOMAIN, MANUFACTURER
 
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
+    """Kuna only uses config flow for configuration."""
+    pass
+
+
+async def async_setup_entry(hass, config_entry, async_add_entities):
+    """Set up Kuna switches from a config entry."""
 
     kuna = hass.data[DOMAIN]
 
@@ -55,6 +61,16 @@ class KunaSwitch(SwitchDevice):
     def is_on(self):
         """Return the state of the switch."""
         return self._camera.bulb_on
+
+    @property
+    def device_info(self):
+        return {
+            "identifiers": {(DOMAIN, self._camera.serial_number)},
+            "name": self._camera.name,
+            "manufacturer": MANUFACTURER,
+            "model": "Camera",
+            "sw_version": self._camera.build,
+        }
 
     def update(self):
         """Fetch state data from the updated account camera dict."""

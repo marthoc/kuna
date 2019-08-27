@@ -1,8 +1,8 @@
-# Kuna Custom Component for Home Assistant
+# Kuna Smart Home Security Custom Integration for Home Assistant
 
-[Home Assistant](https://home-assistant.io/) custom component supporting [Kuna](www.getkuna.com) cameras.
+[Home Assistant](https://home-assistant.io/) custom integration supporting [Kuna](www.getkuna.com) cameras.
 
-**Home Assistant 0.86 or higher is required**.
+**Home Assistant 0.96.0 or higher is required**.
 
 For each camera in a Kuna account, the following devices will be created:
 
@@ -12,8 +12,8 @@ For each camera in a Kuna account, the following devices will be created:
 
 **IoT Class:** _Cloud Polling_
 
-## Installation (Home Assistant >= 0.86)
-This custom component must be installed for it to be loaded by Home Assistant.
+## Installation (Home Assistant >= 0.96.0)
+This custom integration must be installed for it to be loaded by Home Assistant.
 
 1. Create a `custom_components` directory in your Home Assistant configuration directory ('config' share if using [hass.io](https://home-assistant.io/hassio/) with the [Samba](https://home-assistant.io/addons/samba/) add-on or `~/.home-assistant/` for Linux installations).
 1. Get the latest release from GitHub by cd'ing into the custom_components directory and cloning this repo (example below for Hass.io):
@@ -26,21 +26,20 @@ Now, proceed with configuration.
 
 ## Configuration
 
-To enable the component, add the following minimum configuration to `configuration.yaml`:
+To enable the integration, add it from the Configuration - Integrations menu in Home Assistant. Click "+", then "Kuna Smart Home Security".
 
-```yaml
-kuna:
-  email: YOUR_EMAIL
-  password: YOUR_PASSWORD
-```
+_(Note: previous versions of this component were configured in configuration.yaml; now, all configuration is via the Integration menu.)_
 
-| Config Parameter | Optional/Required | Default | Description |
+The following options can be configured when setting up the integration:
+
+| Parameter | Optional/Required | Default | Description |
 |------------------|-------------------|---------|-------------|
 | email            | Required          | N/A     | The email address used to log into the Kuna app. |
 | password         | Required          | N/A     | The password used to log into the Kuna app. |
 | recording_interval | Optional        | 7200    | The frequency, in seconds, that the component checks for new recordings for each camera. |
 | stream_interval  | Optional          | 5       | The frequency, in seconds, that the camera's frontend streaming view will refresh its image. |
 | update_interval  | Optional          | 15      | The frequency, in seconds, that the component polls the Kuna server for updates. |
+
 
 ## Updating
 
@@ -91,6 +90,7 @@ You can use these parameters to build an automation using the event trigger and 
     service: downloader.download_file
     data_template:
       url: '{{ trigger.event.data.url }}'
+      filename: '{{ trigger.event.data.label }}.mp4'
 ```
 
 If you want to limit downloads to only a specific camera, add the `serial_number` parameter under 'event_data' in the trigger.
@@ -98,11 +98,10 @@ If you want to limit downloads to only a specific camera, add the `serial_number
 
 ## Caveats
 
-This component has only been tested with a Maximus Smart Light. Testing and feedback by users with other (and multiple!) Kuna devices would be much appreciated!
+This integration has only been tested with a Maximus Smart Light. Testing and feedback by users with other (and multiple!) Kuna devices would be much appreciated!
 
-This custom component retrieves data from the same private API used by the Kuna mobile app, as Kuna does not offer a public API. Be gentle to the API and use at your own risk!
+This custom integration retrieves data from the same private API used by the Kuna mobile app, as Kuna does not offer a public API. Be gentle to the API and use at your own risk!
 
 ## TODO
 
 - Support streaming from Kuna's websockets streaming endpoint in Home Assistant frontend.
-- Support new streams component 
