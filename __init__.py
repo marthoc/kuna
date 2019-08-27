@@ -135,7 +135,7 @@ class KunaAccount:
     """Represents a Kuna account."""
 
     def __init__(self, hass, email, password, websession, recording_interval):
-        from .pykuna import KunaAPI
+        from pykuna import KunaAPI
 
         self._hass = hass
         self.account = KunaAPI(email, password, websession)
@@ -143,7 +143,7 @@ class KunaAccount:
         self._update_listeners = []
 
     async def update(self, *_):
-        from .pykuna import UnauthorizedError
+        from pykuna import UnauthorizedError
 
         try:
             _LOGGER.debug("Updating Kuna.")
