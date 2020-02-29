@@ -98,7 +98,7 @@ If you want to limit downloads to only a specific camera, add the `serial_number
 
 ## Caveats
 
-This integration has only been tested with a Maximus Smart Light. Testing and feedback by users with other (and multiple!) Kuna devices would be much appreciated!
+This integration has been tested with up to four Maximus Smart Lights and a Maximus Answer DualCam Video Doorbell on a single Kuna account. Testing and feedback by users with other Kuna devices would be much appreciated!
 
 This custom integration retrieves data from the same private API used by the Kuna mobile app, as Kuna does not offer a public API. Be gentle to the API and use at your own risk!
 
