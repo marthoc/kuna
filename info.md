@@ -1,6 +1,6 @@
 # Kuna Smart Home Security Custom Integration for Home Assistant
 
-[Home Assistant](https://home-assistant.io/) custom integration supporting [Kuna](www.getkuna.com) cameras.
+Custom integration supporting Kuna cameras.
 
 For each camera in a Kuna account, the following devices will be created:
 
@@ -40,7 +40,7 @@ downloader:
 ```
 You must ensure that the directory exists before restarting Home Assistant. Given the above example, you would need to ensure that there is a "downloads" subdirectory in your Home Assistant configuration directory, and that the Home Assistant user has write permission to that directory.
 
-Refer to this page for further information on the `downloader` component: https://www.home-assistant.io/components/downloader/
+Refer to https://www.home-assistant.io/components/downloader/ for further information on the `downloader` component.
 
 ### Automatically Downloading Recordings via Automation
 
