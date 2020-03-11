@@ -1,10 +1,6 @@
 # Kuna Smart Home Security Custom Integration for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
-
 [Home Assistant](https://home-assistant.io/) custom integration supporting [Kuna](www.getkuna.com) cameras.
-
-**Home Assistant 0.96.0 or higher is required**.
 
 For each camera in a Kuna account, the following devices will be created:
 
@@ -12,31 +8,9 @@ For each camera in a Kuna account, the following devices will be created:
 - Camera with default name "[Camera Name] Camera".
 - Switch with default name "[Camera Name] Switch", which controls the camera's light bulb.
 
-**IoT Class:** _Cloud Polling_
-
-## Installation (Home Assistant >= 0.96.0)
-This custom integration must be installed for it to be loaded by Home Assistant. 
-
-**The recommended installation method is via [HACS](https://hacs.xyz).**
-
-### Installation via HACS
-
-1. Add "marthoc/kuna" as a custom repository in HACS under "Settings".
-2. Search for "Kuna Smart Home Security" under "Integrations" in HACS.
-3. Click "Install".
-4. Proceed with Configuration.
-
-### Manual Installation
-
-1. Create a `custom_components` directory in your Home Assistant configuration directory ('config' share if using [hass.io](https://home-assistant.io/hassio/) with the [Samba](https://home-assistant.io/addons/samba/) add-on or `~/.home-assistant/` for Linux installations).
-2. Create a `kuna` directory in your `custom_components` directory.
-3. Grab the latest release from the GitHub "Releases" page.
-4. Copy all files (including the hidden `.translations` directory) from custom_components/kuna in the release to your config/custom_components/kuna directory.
-5. Restart Home Assistant and proceed with Configuration.
-
 ## Configuration
 
-To enable the integration, add it from the Configuration - Integrations menu in Home Assistant. Click "+", then "Kuna Smart Home Security".
+After installing via HACS, to enable the integration, add it from the Configuration - Integrations menu in Home Assistant. Click "+", then "Kuna Smart Home Security".
 
 _(Note: previous versions of this component were configured in configuration.yaml; now, all configuration is via the Integration menu.)_
 
@@ -49,10 +23,6 @@ The following options can be configured when setting up the integration:
 | recording_interval | Optional        | 7200    | The frequency, in seconds, that the component checks for new recordings for each camera. |
 | stream_interval  | Optional          | 5       | The frequency, in seconds, that the camera's frontend streaming view will refresh its image. |
 | update_interval  | Optional          | 15      | The frequency, in seconds, that the component polls the Kuna server for updates. |
-
-## Updating
-
-Update via HACS or by grabbing the latest release and overwriting the contents of your config/custom_components/kuna directory with the contents of custom_components/kuna in the release.
 
 ## Downloading Recordings
 
@@ -85,6 +55,7 @@ For each recording available in the Kuna API, this component fires a Home Assist
   - **duration**: the length of the recording in seconds
   - **url**: the web address at which an mp4 file of the recording is available for download
 
+
 You can use these parameters to build an automation using the event trigger and templates. To download all recordings, set up the following automation:
 
 ```yaml
@@ -105,10 +76,4 @@ If you want to limit downloads to only a specific camera, add the `serial_number
 
 ## Caveats
 
-This integration has only been tested with a Maximus Smart Light. Testing and feedback by users with other (and multiple!) Kuna devices would be much appreciated!
-
 This custom integration retrieves data from the same private API used by the Kuna mobile app, as Kuna does not offer a public API. Be gentle to the API and use at your own risk!
-
-## TODO
-
-- Support streaming from Kuna's websockets streaming endpoint in Home Assistant frontend.

@@ -1,0 +1,7 @@
+{
+    "name": "Kuna Smart Home Security",
+    "domains": ["binary_sensor", "camera", "switch"],
+    "homeassistant": "0.96.0",
+    "iot_class": "Cloud Polling"
+  }
+  
