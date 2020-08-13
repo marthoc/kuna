@@ -118,7 +118,7 @@ class KunaCamera(Camera):
     def _ready_for_snapshot(self, now):
         return self._next_snapshot_at is None or now > self._next_snapshot_at
 
-    async def camera_image(self):
+    async def async_camera_image(self):
         """Get and return an image from the camera, only once every stream_interval seconds."""
         stream_interval = timedelta(seconds=self._config[CONF_STREAM_INTERVAL])
         now = utcnow()
