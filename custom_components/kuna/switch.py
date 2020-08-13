@@ -4,7 +4,7 @@ https://github.com/marthoc/kuna
 """
 import logging
 
-from homeassistant.components.switch import SwitchDevice
+from homeassistant.components.switch import SwitchEntity
 from .const import DOMAIN, MANUFACTURER
 
 
@@ -31,7 +31,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(devices, True)
 
 
-class KunaSwitch(SwitchDevice):
+class KunaSwitch(SwitchEntity):
     def __init__(self, kuna, camera):
         self._account = kuna
         self._camera = camera
