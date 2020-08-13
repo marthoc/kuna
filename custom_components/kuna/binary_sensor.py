@@ -4,7 +4,7 @@ https://github.com/marthoc/kuna
 """
 import logging
 
-from homeassistant.components.binary_sensor import BinarySensorDevice
+from homeassistant.components.binary_sensor import BinarySensorEntity
 from .const import DOMAIN, MANUFACTURER
 
 
@@ -31,7 +31,7 @@ async def async_setup_entry(hass, config_entry, async_add_entities):
     async_add_entities(devices, True)
 
 
-class KunaBinarySensor(BinarySensorDevice):
+class KunaBinarySensor(BinarySensorEntity):
     def __init__(self, kuna, camera):
         self._account = kuna
         self._camera = camera
