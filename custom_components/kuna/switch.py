@@ -91,12 +91,12 @@ class KunaSwitch(SwitchDevice):
         """Add callback after being added to hass."""
         self._account.add_update_listener(self.update_callback)
 
-    async def turn_on(self, **kwargs):
+    async def async_turn_on(self, **kwargs):
         """Turn the switch on."""
         await self._camera.light_on()
         await self._account.update()
 
-    async def turn_off(self, **kwargs):
+    async def async_turn_off(self, **kwargs):
         """Turn the device off."""
         await self._camera.light_off()
         await self._account.update()
