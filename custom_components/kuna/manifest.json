@@ -5,5 +5,6 @@
   "documentation": "https://github.com/marthoc/kuna",
   "dependencies": [],
   "codeowners": ["@marthoc"],
-  "requirements": ["pykuna==0.6.0"]
+  "requirements": ["pykuna==0.6.0"],
+  "version": "9.1.0"
 }
