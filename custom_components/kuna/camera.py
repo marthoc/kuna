@@ -97,7 +97,7 @@ class KunaCamera(Camera):
 
     def update(self):
         """Fetch state data from the updated account camera dict."""
-        self.is_streaming = True
+        self._is_streaming = True
         try:
             self._camera = self._account.account.cameras[self._original_id]
         except KeyError:
