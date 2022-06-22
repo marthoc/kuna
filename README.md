@@ -1,6 +1,6 @@
 # Kuna Smart Home Security Custom Integration for Home Assistant
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/custom-components/hacs)
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 
 [Home Assistant](https://home-assistant.io/) custom integration supporting [Kuna](www.getkuna.com) cameras.
 
